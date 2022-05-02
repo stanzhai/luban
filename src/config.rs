@@ -7,12 +7,10 @@ use once_cell::sync::OnceCell;
 pub struct Config {
     /// PostgreSQL 数据库连接地址
     pub db_url: String,
-    /// Web服务器绑定的ip地址
-    pub ip: String,
     /// Web服务器端口
-    pub port: String,
+    pub http_port: String,
     /// 对外开放的域名+端口
-    pub host: String,
+    pub domain: String,
     /// LDAP服务器地址
     pub ldap_server: String,
     /// LDAP认证base dn
@@ -29,17 +27,15 @@ impl Config {
         // get env vars
         dotenv::dotenv().ok();
         let db_url = env::var("DB_URL").expect("DB_URL is not set in .env file");
-        let ip = env::var("IP").expect("IP is not set in .env file");
-        let port = env::var("PORT").expect("PORT is not set in .env file");
-        let host = env::var("HOST").expect("HOST is not set in .env file");
+        let http_port = env::var("HTTP_PORT").expect("HTTP_PORT is not set in .env file");
+        let domain = env::var("DOMAIN").expect("DOMAIN is not set in .env file");
         let ldap_server = env::var("LDAP_SERVER").expect("LDAP_SERVER is not set in .env file");
         let ldap_base = env::var("LDAP_BASE").expect("LDAP_BASE is not set in .env file");
         INSTANCE
             .set(Config {
                 db_url,
-                ip,
-                port,
-                host,
+                http_port,
+                domain,
                 ldap_server,
                 ldap_base,
             })

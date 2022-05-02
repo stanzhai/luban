@@ -14,9 +14,9 @@ pub mod endpoint;
 pub mod response;
 pub mod state;
 
-fn routes(state: State, server_url: &str) -> impl poem::Endpoint {
+fn routes(state: State, domain: &str) -> impl poem::Endpoint {
     let api_service = OpenApiService::new((auth::AuthApi, project::Project), "LuBan Api", "1.0")
-        .server(format!("http://{}/api", server_url));
+        .server(format!("http://{}/api", domain));
     let ui = api_service.swagger_ui();
 
     Route::new()
@@ -32,14 +32,14 @@ fn routes(state: State, server_url: &str) -> impl poem::Endpoint {
 
 pub async fn start(conn: DatabaseConnection) -> Result<(), std::io::Error> {
     let config = config::Config::global();
-    let server_url = format!("{}:{}", config.host, config.port);
+    let server_url = format!("0.0.0.0:{}", config.http_port);
     let state = State { conn };
 
     println!("Starting server at {}", server_url);
 
-    let http_host = &config.host;
-    let route = routes(state, http_host.as_str());
-    let domain_endpoint = Domain::new(http_host.to_owned(), route);
+    let domain = &config.domain;
+    let route = routes(state, domain.as_str());
+    let domain_endpoint = Domain::new(domain.to_owned(), route);
     let server = Server::new(TcpListener::bind(server_url));
     server.run(domain_endpoint).await
 }
