@@ -26,6 +26,7 @@ const router = createRouter({
   routes,
 })
 router.beforeEach(async (to, from) => {
+  console.log(Cookies.get('sid'))
   if (!Cookies.get('sid') && to.path !== '/login') {
     return '/login'
   }

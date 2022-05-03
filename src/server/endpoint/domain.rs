@@ -33,7 +33,7 @@ impl<E: Endpoint> Endpoint for Domain<E> {
             } else {
                 let res = Response::builder()
                     .status(StatusCode::BAD_REQUEST)
-                    .body(format!("Request host must be: {}", host));
+                    .body(format!("Request host must be: {}", self.domain));
                 Ok(res)
             }
         } else {

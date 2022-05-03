@@ -1,12 +1,11 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { ElMessage } from 'element-plus'
 
 // 时间过期的设置
 const TIME_OUT = 300000
 const TIPS_DURATION = 2
-const BASE_URL = process.env.BASE_URL || ''
 const http = axios.create({
-    baseURL: BASE_URL,
     timeout: TIME_OUT
 })
 /**
@@ -45,7 +44,7 @@ http.interceptors.response.use(async (response) => {
     if (status === 200) {
         // handle normal error
         if (!data.success) {
-            //message.error(data.message, TIPS_DURATION)
+            ElMessage.error(data.message)
             return Promise.reject(data)
         }
         // 如有有payload 就直接返回 data 不然返回 response
@@ -56,14 +55,13 @@ http.interceptors.response.use(async (response) => {
     let res = error?.response?.data
     // 未登录处理
     if (res && res.code == 401) {
-        //message.error("Session过期，请重新登录..", TIPS_DURATION)
-        alert("session 过期")
+        ElMessage.error("Session过期，请重新登录..")
         Cookies.remove("sid")
         setTimeout(() => {
             location.reload()
         }, 1500)
     } else {
-        //message.error(res?.message || error.message, TIPS_DURATION)
+        ElMessage.error(res?.message || error.message)
         return Promise.reject(error)
     }
 })

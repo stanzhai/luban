@@ -23,7 +23,7 @@ fn routes(state: State, domain: &str) -> impl poem::Endpoint {
         .nest("/api", api_service)
         .nest("/docs", ui)
         .with(ServerSession::new(
-            CookieConfig::new().secure(false).name("sid"),
+            CookieConfig::new().secure(false).http_only(false).name("sid"),
             MemoryStorage::new(),
         ))
         .with(middleware::Tracing)
