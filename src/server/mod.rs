@@ -4,15 +4,21 @@ use poem::{
     session::{CookieConfig, MemoryStorage, ServerSession},
     EndpointExt, Route, Server,
 };
+use poem::endpoint::{EmbeddedFileEndpoint, EmbeddedFilesEndpoint};
 use poem_openapi::OpenApiService;
 use sea_orm::{entity::*, DatabaseConnection};
 use state::State;
+use rust_embed::RustEmbed;
 
 use crate::{api::*, config, server::endpoint::domain::Domain};
 
 pub mod endpoint;
 pub mod response;
 pub mod state;
+
+#[derive(RustEmbed)]
+#[folder = "web/dist"]
+pub struct Files;
 
 fn routes(state: State, domain: &str) -> impl poem::Endpoint {
     let api_service = OpenApiService::new((auth::AuthApi, project::Project), "LuBan Api", "1.0")
@@ -22,6 +28,7 @@ fn routes(state: State, domain: &str) -> impl poem::Endpoint {
     Route::new()
         .nest("/api", api_service)
         .nest("/docs", ui)
+        .nest("/", EmbeddedFilesEndpoint::<Files>::new())
         .with(ServerSession::new(
             CookieConfig::new().secure(false).http_only(false).name("sid"),
             MemoryStorage::new(),
